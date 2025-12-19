@@ -68,6 +68,11 @@ target_include_directories(cereal INTERFACE
     $<INSTALL_INTERFACE:include>
 )
 list(APPEND CEREAL_THREAD_LIBS cereal::cereal)
+# Fix false-positive dangling reference error on GCC
+# if-clause from https://github.com/Levi-Armstrong/cereal/pull/1/commits/581f9795b8156c458ec654f6dfb6ee07babfd2c2
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 13 AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 14)
+    target_compile_options(cereal INTERFACE "-Wno-dangling-reference")
+endif ()
 
 if(NOT CMAKE_VERSION VERSION_LESS 3.8)
     target_compile_features(cereal INTERFACE cxx_std_11)
